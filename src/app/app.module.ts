@@ -13,6 +13,6 @@ import {BookModule} from './book/book.module';
     BookModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }
