@@ -24,11 +24,3 @@
                    (valueUpdate)="updateBooksOn($event)"
                    class="col-4"></ba-book-details>
 </div>
-<section>
-  <input id="typeahead" class="form-control-lg" #typeahead>
-  <div>
-    <ul>
-      <li *ngFor="let token of matches$ | async">{{token}}</li>
-    </ul>
-  </div>
-</section>

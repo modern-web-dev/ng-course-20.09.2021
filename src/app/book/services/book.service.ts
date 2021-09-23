@@ -1,80 +1,38 @@
 import {Book} from '../model/book';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 export class BookService {
-  search(query: string): Observable<string[]> {
-    return new Observable<string[]>(subscriber => {
-      setTimeout(() => {
-        subscriber.next([query, `${query}_1`, `${query}_2`]);
-        subscriber.complete();
-      }, 2000);
-    })
+  private booksSubject = new BehaviorSubject<Book[]>([
+    {
+      id: 0,
+      author: 'Douglas Crockford',
+      title: 'JavaScript. The Good Parts'
+    },
+    {
+      id: 1,
+      author: 'Marek Matczak',
+      title: 'Angular for nerds'
+    },
+    {
+      id: 2,
+      author: 'Tom Hombergs',
+      title: 'Get You Hands Dirty on Hexagonal Architecture'
+    }
+  ]);
+  // valueChanges = this.booksSubject.asObservable();
+
+  update(bookToUpdate: Book): Observable<Book> {
+    return new Observable<Book>(subscriber => {
+      const bookCopy: Book = {...bookToUpdate};
+      const currentBooks = this.booksSubject.getValue();
+      const newBooks =  currentBooks.map(book => bookToUpdate.id === book.id ? bookCopy : book);
+      this.booksSubject.next(newBooks);
+      subscriber.next(bookCopy);
+      subscriber.complete();
+    });
   }
 
   findAll(): Observable<Book[]> {
-    return of([
-      {
-        id: 0,
-        author: 'Douglas Crockford',
-        title: 'JavaScript. The Good Parts'
-      },
-      {
-        id: 1,
-        author: 'Marek Matczak',
-        title: 'Angular for nerds'
-      },
-      {
-        id: 2,
-        author: 'Tom Hombergs',
-        title: 'Get You Hands Dirty on Hexagonal Architecture'
-      }
-    ]);
-
-
-    // return new Observable<Book[]>(subscriber => {
-    //   // setTimeout(() => {
-    //     subscriber.next([
-    //       {
-    //         id: 0,
-    //         author: 'Douglas Crockford',
-    //         title: 'JavaScript. The Good Parts'
-    //       },
-    //       {
-    //         id: 1,
-    //         author: 'Marek Matczak',
-    //         title: 'Angular for nerds'
-    //       },
-    //       {
-    //         id: 2,
-    //         author: 'Tom Hombergs',
-    //         title: 'Get You Hands Dirty on Hexagonal Architecture'
-    //       }
-    //     ]);
-    //     subscriber.complete();
-      // }, 2000)
-    // });
-
-
-    // return new Promise<Book[]>(resolve => {
-    //   setTimeout(()=>{
-    //     resolve([
-    //       {
-    //         id: 0,
-    //         author: 'Douglas Crockford',
-    //         title: 'JavaScript. The Good Parts'
-    //       },
-    //       {
-    //         id: 1,
-    //         author: 'Marek Matczak',
-    //         title: 'Angular for nerds'
-    //       },
-    //       {
-    //         id: 2,
-    //         author: 'Tom Hombergs',
-    //         title: 'Get You Hands Dirty on Hexagonal Architecture'
-    //       }
-    //     ]);
-    //   }, 0);
-    // })
+    return this.booksSubject.asObservable();
   }
 }
