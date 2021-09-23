@@ -4,7 +4,6 @@ import {BookModule} from './book/book.module';
 import {BookService} from './book/services/book.service';
 import {Observable, of} from 'rxjs';
 import {Book} from './book/model/book';
-import HtmlReporter = jasmine.HtmlReporter;
 
 describe('AppComponent', () => {
   beforeEach(async () => {
