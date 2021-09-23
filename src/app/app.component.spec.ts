@@ -1,12 +1,27 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import {TestBed} from '@angular/core/testing';
+import {AppComponent} from './app.component';
+import {BookModule} from './book/book.module';
+import {BookService} from './book/services/book.service';
+import {Observable, of} from 'rxjs';
+import {Book} from './book/model/book';
+import HtmlReporter = jasmine.HtmlReporter;
 
-xdescribe('AppComponent', () => {
+describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [
         AppComponent
       ],
+      imports: [
+        BookModule.forRoot()
+      ],
+      providers: [{
+        provide: BookService, useValue: {
+          findAll(): Observable<Book[]> {
+            return of([{id: 1, title: 'Funny book', author: 'Little John'}]);
+          }
+        }
+      }]
     }).compileComponents();
   });
 
@@ -16,16 +31,14 @@ xdescribe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'book-app'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('book-app');
-  });
-
-  it('should render title', () => {
+  it('renders a test book', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('book-app app is running!');
-  });
+    const appElement = fixture.nativeElement as HTMLElement;
+    const rowElement = appElement.querySelector<HTMLTableRowElement>('table > tbody > tr');
+    const cells = rowElement?.querySelectorAll<HTMLTableElement>('td');
+    expect(cells?.length).toBe(2);
+    const authorCell: HTMLTableElement | undefined = cells?.item(0);
+    expect(authorCell?.textContent).toBe('Little John');
+  })
 });
