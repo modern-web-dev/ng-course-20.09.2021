@@ -1,5 +1,4 @@
-<nav><a routerLink="..">Back to results</a></nav>
-<form (submit)="notifyOnBookChange($event)">
+<form (submit)="saveAndGoToOverview($event)">
   <div class="mb-3">
     <label for="author" class="form-label">Author:</label>
     <input type="text" id="author" class="form-control" [value]="book?.author">

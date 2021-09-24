@@ -1,20 +1,22 @@
-import {Book} from '../model/book';
+import {Book, BookProps} from '../model/book';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 export class BookService {
+  private idSeq = 0;
+
   private booksSubject = new BehaviorSubject<Book[]>([
     {
-      id: 0,
+      id: this.idSeq++,
       author: 'Douglas Crockford',
       title: 'JavaScript. The Good Parts'
     },
     {
-      id: 1,
+      id: this.idSeq++,
       author: 'Marek Matczak',
       title: 'Angular for nerds'
     },
     {
-      id: 2,
+      id: this.idSeq++,
       author: 'Tom Hombergs',
       title: 'Get You Hands Dirty on Hexagonal Architecture'
     }
@@ -29,6 +31,17 @@ export class BookService {
       subscriber.next(bookCopy);
       subscriber.complete();
     });
+  }
+
+  save(bookToSave: BookProps): Observable<Book> {
+    return new Observable<Book>(subscriber => {
+      const newBook = {id: this.idSeq++, ...bookToSave};
+      const currentBooks = this.booksSubject.getValue();
+      const newBooks = [...currentBooks, newBook];
+      this.booksSubject.next(newBooks);
+      subscriber.next(newBook);
+      subscriber.complete();
+    })
   }
 
   findAll(): Observable<Book[]> {

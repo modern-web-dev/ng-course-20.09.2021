@@ -37,7 +37,7 @@ describe('BookDetailsComponent', () => {
         expect(updatedBook.title).toBe(updatedTitle);
       });
       // 2. when
-      component.notifyOnBookChange(eventStub);
+      component.saveAndGoToOverview(eventStub);
     });
   });
 

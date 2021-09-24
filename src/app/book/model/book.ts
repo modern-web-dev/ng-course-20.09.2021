@@ -1,5 +1,7 @@
 export interface Book {
-  id?: number;
+  id: number;
   author: string;
   title: string
 }
+
+export type BookProps = Omit<Book, 'id'>;
