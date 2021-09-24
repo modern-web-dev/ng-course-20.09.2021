@@ -19,13 +19,12 @@ export class BookService {
       title: 'Get You Hands Dirty on Hexagonal Architecture'
     }
   ]);
-  // valueChanges = this.booksSubject.asObservable();
 
   update(bookToUpdate: Book): Observable<Book> {
     return new Observable<Book>(subscriber => {
       const bookCopy: Book = {...bookToUpdate};
       const currentBooks = this.booksSubject.getValue();
-      const newBooks =  currentBooks.map(book => bookToUpdate.id === book.id ? bookCopy : book);
+      const newBooks = currentBooks.map(book => bookToUpdate.id === book.id ? bookCopy : book);
       this.booksSubject.next(newBooks);
       subscriber.next(bookCopy);
       subscriber.complete();
@@ -34,5 +33,18 @@ export class BookService {
 
   findAll(): Observable<Book[]> {
     return this.booksSubject.asObservable();
+  }
+
+  getOne(bookId: number): Observable<Book> {
+    return new Observable(subscriber => {
+      const currentBooks = this.booksSubject.getValue();
+      const foundBook = currentBooks.find(book => book.id === bookId);
+      if (foundBook) {
+        subscriber.next(foundBook);
+        subscriber.complete();
+      } else {
+        subscriber.error(`Book with ID: ${bookId} could not be found!`);
+      }
+    });
   }
 }
