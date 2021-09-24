@@ -1,5 +1,6 @@
 import {Book, BookProps} from '../model/book';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {delay} from 'rxjs/operators';
 
 export class BookService {
   private idSeq = 0;
@@ -49,7 +50,7 @@ export class BookService {
   }
 
   getOne(bookId: number): Observable<Book> {
-    return new Observable(subscriber => {
+    return new Observable<Book>(subscriber => {
       const currentBooks = this.booksSubject.getValue();
       const foundBook = currentBooks.find(book => book.id === bookId);
       if (foundBook) {

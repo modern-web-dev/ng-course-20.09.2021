@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {BookService} from '../../services/book.service';
 import {Observable, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'ba-book-details',
@@ -11,34 +12,40 @@ import {takeUntil} from 'rxjs/operators';
   styleUrls: ['./book-details.component.scss']
 })
 export class BookDetailsComponent implements OnDestroy {
-  book: Book | undefined;
+  bookForm: FormGroup;
+  private readonly book: Book | undefined;
   private unsubscribe = new Subject();
 
   constructor(private books: BookService,
               private router: Router,
               private currentRoute: ActivatedRoute) {
     this.book = currentRoute.snapshot.data.book;
+    this.bookForm = new FormGroup({
+      author: new FormControl(null, [Validators.required, Validators.maxLength(30)]),
+      title: new FormControl(null, Validators.required)
+    });
+    if (this.book) {
+      this.bookForm.patchValue(this.book);
+    }
   }
 
-  saveAndGoToOverview(event: Event) {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const authorElement = form.querySelector<HTMLInputElement>('#author');
-    const author = authorElement?.value || '';
-    const titleElement = form.querySelector<HTMLInputElement>('#title');
-    const title = titleElement?.value || '';
+  saveAndGoToOverview() {
+    if (this.bookForm.valid) {
+      const author = this.bookForm.get('author')?.value;
+      const title = this.bookForm.get('title')?.value;
 
-    let saveOrUpdate: Observable<Book>;
-    if (this.book) { // edit existing book
-      const bookToUpdate: Book = {id: this.book.id, author, title};
-      saveOrUpdate = this.books.update(bookToUpdate);
-    } else { // new book
-      const bookToSave: BookProps = {author, title};
-      saveOrUpdate = this.books.save(bookToSave)
+      let saveOrUpdate: Observable<Book>;
+      if (this.book) { // edit existing book
+        const bookToUpdate: Book = {...this.book, author, title};
+        saveOrUpdate = this.books.update(bookToUpdate);
+      } else { // new book
+        const bookToSave: BookProps = {author, title};
+        saveOrUpdate = this.books.save(bookToSave)
+      }
+
+      saveOrUpdate.pipe(takeUntil(this.unsubscribe)).subscribe(
+        () => this.router.navigate(['..'], {relativeTo: this.currentRoute}))
     }
-
-    saveOrUpdate.pipe(takeUntil(this.unsubscribe)).subscribe(
-      () => this.router.navigate(['..'], {relativeTo: this.currentRoute}))
   }
 
   ngOnDestroy(): void {

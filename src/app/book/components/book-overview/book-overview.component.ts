@@ -16,7 +16,7 @@ export class BookOverviewComponent {
   constructor(private books: BookService,
               private router: Router,
               private currentRoute: ActivatedRoute) {
-    this.books$ = books.findAll().pipe(delay(2000));
+    this.books$ = books.findAll();
   }
 
   goToDetailsOf(book: Book): void {
